@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Yoga Pose Tracker{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background-color: #6a11cb;
+            background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #f1f5f9;
+            border-bottom: none;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background-image: linear-gradient(to right, #5a0eb1 0%, #1a66e0 100%);
+        }
+        .btn-outline-primary {
+            color: #6a11cb;
+            border-color: #6a11cb;
+        }
+        .btn-outline-primary:hover {
+            background-color: #6a11cb;
+            color: white;
+        }
+        .flash-messages {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        .flash-message {
+            margin-bottom: 10px;
+            animation: fadeOut 5s forwards;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <div class="container">
+                <a href="/" class="me-3">
+                    <img src="{{ url_for('static', filename='Logo.jpg') }}" alt="Logo" class="university-logo" height="80">
+                </a>
+            <a class="navbar-brand" href="/">
+            </i>Yoga Pose Tracker
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home me-1"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/workout_history"><i class="fas fa-calendar-alt me-1"></i> History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/signup"><i class="fas fa-user-plus me-1"></i> Sign Up</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show flash-message">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="mt-5">
+        <div class="container text-center">
+            <p>© 2025 Yoga Pose Tracker | Made with <i class="fas fa-heart text-danger"></i> for better health</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        // Auto-dismiss flash messages after 5 seconds
+        setTimeout(function() {
+            $('.flash-message').fadeOut('slow');
+        }, 5000);
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

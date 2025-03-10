@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% block title %}Workout History{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ month_name }} {{ year }}</h5>
+                <div class="btn-group">
+                    <a href="{{ url_for('workout_history', year=prev_year, month=prev_month) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-chevron-left"></i> Prev
+                    </a>
+                    <a href="{{ url_for('workout_history', year=next_year, month=next_month) }}" class="btn btn-sm btn-outline-primary">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="calendar-container">
+                    <table class="calendar">
+                        <thead>
+                            <tr>
+                                <th>Mon</th>
+                                <th>Tue</th>
+                                <th>Wed</th>
+                                <th>Thu</th>
+                                <th>Fri</th>
+                                <th>Sat</th>
+                                <th>Sun</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for week in calendar %}
+                            <tr>
+                                {% for day in week %}
+                                <td class="{% if day == 0 %}empty{% endif %}">
+                                    {% if day != 0 %}
+                                    <div class="day-container" data-date="{{ year }}-{{ '%02d'|format(month) }}-{{ '%02d'|format(day) }}">
+                                        <span class="day-number">{{ day }}</span>
+                                        {% if day in workout_data %}
+                                        <div class="workout-indicator" data-sequences="{{ workout_data[day].sequences }}">
+                                            {{ workout_data[day].sequences }} seq
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Your Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <div class="stat-value">{{ stats.total_workouts }}</div>
+                        <div class="stat-label">Total Workouts</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">{{ stats.total_sequences }}</div>
+                        <div class="stat-label">Sequences</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">{{ stats.current_streak }}</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Workout Details</h5>
+            </div>
+            <div class="card-body" id="workout-details">
+                <div class="text-center py-4">
+                    <p class="text-muted">Select a date to view details</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Workout Detail Modal -->
+<div class="modal fade" id="workoutDetailModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDate">Workout Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                Loading...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set workout indicator background colors based on sequence count
+        document.querySelectorAll('.workout-indicator').forEach(indicator => {
+            const sequences = parseFloat(indicator.dataset.sequences);
+            const intensity = Math.min(0.9, 0.3 + (sequences / 10));
+            indicator.style.backgroundColor = `rgba(25, 135, 84, ${intensity})`;
+        });
+        
+        const dayContainers = document.querySelectorAll('.day-container');
+        const workoutDetailsElement = document.getElementById('workout-details');
+        const workoutDetailModal = new bootstrap.Modal(document.getElementById('workoutDetailModal'));
+        const modalDate = document.getElementById('modalDate');
+        const modalContent = document.getElementById('modalContent');
+        
+        dayContainers.forEach(day => {
+            day.addEventListener('click', function() {
+                const date = this.dataset.date;
+                fetchWorkoutDetails(date);
+            });
+        });
+        
+        function fetchWorkoutDetails(date) {
+            fetch(`/api/workout-details/${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayWorkoutDetails(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching workout details:', error);
+                    workoutDetailsElement.innerHTML = '<div class="alert alert-danger">Error loading workout details</div>';
+                });
+        }
+        
+        function displayWorkoutDetails(data) {
+            if (data.workouts && data.workouts.length > 0) {
+                // Format date for display
+                const dateObj = new Date(data.date);
+                const formattedDate = dateObj.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                
+                modalDate.textContent = `Workouts - ${formattedDate}`;
+                
+                let detailsHtml = `
+                    <div class="workout-summary mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>Summary</h5>
+                            <span class="badge bg-success">${data.total_sequences} sequences</span>
+                        </div>
+                        <hr>
+                    </div>
+                    <div class="workout-timeline">
+                        <h5>Timeline</h5>
+                `;
+                
+                data.workouts.forEach(workout => {
+                    detailsHtml += `
+                        <div class="timeline-item">
+                            <div class="timeline-time">${workout.time}</div>
+                            <div class="timeline-content">
+                                <div class="d-flex justify-content-between">
+                                    <span>Workout Session</span>
+                                    <span class="badge bg-primary">${workout.sequences} sequences</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                detailsHtml += '</div>';
+                modalContent.innerHTML = detailsHtml;
+                
+                // Show modal with details
+                workoutDetailModal.show();
+            } else {
+                modalDate.textContent = `No Workouts`;
+                modalContent.innerHTML = '<p class="text-center py-3">No workouts recorded for this date.</p>';
+                workoutDetailModal.show();
+            }
+        }
+    });
+</script>
+{% endblock %}

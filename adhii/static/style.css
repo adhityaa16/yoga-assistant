@@ -1,0 +1,271 @@
+/* style.css */
+:root {
+    --primary-color: #4c8bf5;
+    --secondary-color: #34a853;
+    --accent-color: #ea4335;
+    --light-gray: #f8f9fa;
+    --dark-gray: #343a40;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+}
+
+/* Navbar styling */
+.navbar-brand i {
+    margin-right: 8px;
+}
+
+/* Video container styling */
+#video-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background-color: #000;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 10;
+    color: white;
+}
+
+#video-feed {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Session controls */
+#session-controls {
+    display: flex;
+    gap: 10px;
+}
+
+/* Pose progress styling */
+#pose-progress {
+    text-align: center;
+    padding: 15px;
+}
+
+#current-pose {
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--dark-gray);
+}
+
+.progress {
+    height: 10px;
+    margin-bottom: 15px;
+}
+
+.progress-bar {
+    background-color: var(--secondary-color);
+}
+
+/* Stats styling */
+.stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-item i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.stat-item span {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/* Stats container styles */
+.stats-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+.stat-box {
+    text-align: center;
+    padding: 10px;
+    flex: 1;
+    min-width: 85px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0d6efd;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* Calendar styling */
+.calendar-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.calendar {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.calendar th {
+    text-align: center;
+    padding: 8px;
+    background-color: var(--light-gray);
+    font-weight: 600;
+}
+
+.calendar td {
+    position: relative;
+    height: 80px;
+    width: 14.28%;
+    border: 1px solid #e9ecef;
+    vertical-align: top;
+    text-align: center;
+    padding: 8px;
+}
+
+.calendar td.empty {
+    background-color: #f8f9fa;
+}
+
+.day-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.day-container:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.day-number {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.workout-indicator {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    background-color: rgba(25, 135, 84, 0.5); /* Default color that will be overridden by JS */
+}
+
+/* Workout timeline */
+.workout-timeline {
+    margin-top: 20px;
+}
+
+.timeline-item {
+    display: flex;
+    margin-bottom: 15px;
+    position: relative;
+    padding-left: 25px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #0d6efd;
+}
+
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 12px;
+    bottom: -15px;
+    width: 2px;
+    background-color: #e9ecef;
+}
+
+.timeline-item:last-child::after {
+    display: none;
+}
+
+.timeline-time {
+    width: 60px;
+    padding-right: 10px;
+    text-align: right;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+}
+
+.timeline-content {
+    flex-grow: 1;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #video-container {
+        height: 300px;
+    }
+    
+    .calendar td {
+        height: 70px;
+    }
+    
+    .stats-row {
+        gap: 20px;
+    }
+}
